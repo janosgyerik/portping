@@ -31,7 +31,7 @@ func acceptN(host string, port int, count int) {
 
 func ping(host string, port int) bool {
 	err := Ping(host, port)
-	fmt.Printf("%s:%d %v", host, port, err)
+	log.Printf("port ping %s:%d %v", host, port, err)
 	return err == nil
 }
 
