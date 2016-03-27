@@ -29,45 +29,52 @@ func acceptN(host string, port int, count int) {
 	}
 }
 
-func ping(host string, port int) bool {
+func assertPingResult(host string, port int, t*testing.T, expected bool) {
 	err := Ping(host, port)
-	log.Printf("port ping %s:%d %v", host, port, err)
-	return err == nil
+	addr := fmt.Sprintf("%s:%d", host, port)
+	log.Printf("port ping %s %v", addr, err)
+
+	actual := err == nil
+	if expected != actual {
+		var openOrClosed string
+		if expected {
+			openOrClosed = "open"
+		} else {
+			openOrClosed = "closed"
+		}
+		t.Errorf("%s should be %s", addr, openOrClosed)
+	}
+}
+
+func assertPingSuccess(host string, port int, t*testing.T) {
+	assertPingResult(host, port, t, true)
+}
+
+func assertPingFailure(host string, port int, t*testing.T) {
+	assertPingResult(host, port, t, false)
 }
 
 func Test_ping_open_port(t*testing.T) {
 	go acceptN(testHost, testPort, 1)
 
-	if !ping(testHost, testPort) {
-		t.Errorf("should be open")
-	}
+	assertPingSuccess(testHost, testPort, t)
 
 	// for sanity: acceptN should have shut down already
-	if ping(testHost, testPort) {
-		t.Errorf("should be closed")
-	}
+	assertPingFailure(testHost, testPort, t)
 }
 
 func Test_ping_unopen_port(t*testing.T) {
-	if ping(testHost, testPort) {
-		t.Errorf("should be closed")
-	}
+	assertPingFailure(testHost, testPort, t)
 }
 
 func Test_ping_nonexistent_host(t*testing.T) {
-	if ping(knownNonexistentHost, testPort) {
-		t.Errorf("should be closed")
-	}
+	assertPingFailure(knownNonexistentHost, testPort, t)
 }
 
 func Test_ping_negative_port(t*testing.T) {
-	if ping(testHost, -1) {
-		t.Errorf("should be closed")
-	}
+	assertPingFailure(testHost, -1, t)
 }
 
 func Test_ping_too_high_port(t*testing.T) {
-	if ping(testHost, 123456) {
-		t.Errorf("should be closed")
-	}
+	assertPingFailure(testHost, 123456, t)
 }
