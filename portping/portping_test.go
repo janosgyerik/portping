@@ -3,11 +3,31 @@ package portping
 import (
 	"testing"
 	"fmt"
+	"net"
+	"log"
 )
 
-// TODO use localhost
-const host = "192.168.1.10"
-const localhost = "localhost"
+const testHost = "localhost"
+
+// TODO hopefully unused. Better ideas?
+const testPort = 1234
+
+const knownNonexistentHost = "nonexistent.janosgyerik.com"
+
+func acceptN(host string, port int, count int) {
+	ln, err := net.Listen("tcp", fmt.Sprintf("%s:%d", host, port))
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer ln.Close()
+	for i := 0; i < count; i++ {
+		conn, err := ln.Accept()
+		if err != nil {
+			log.Fatal(err)
+		}
+		conn.Close()
+	}
+}
 
 func ping(host string, port int) bool {
 	err := Ping(host, port)
@@ -16,37 +36,38 @@ func ping(host string, port int) bool {
 }
 
 func Test_ping_open_port(t*testing.T) {
-	// TODO listen on a port to ensure it's open
-	open_port := 22
+	go acceptN(testHost, testPort, 1)
 
-	if !ping(host, open_port) {
+	if !ping(testHost, testPort) {
 		t.Errorf("should be open")
+	}
+
+	// for sanity: acceptN should have shut down already
+	if ping(testHost, testPort) {
+		t.Errorf("should be closed")
 	}
 }
 
 func Test_ping_unopen_port(t*testing.T) {
-	// TODO choose some random port guaranteed closed
-	unopen_port := 123
-
-	if ping(host, unopen_port) {
+	if ping(testHost, testPort) {
 		t.Errorf("should be closed")
 	}
 }
 
 func Test_ping_nonexistent_host(t*testing.T) {
-	if ping("nonexistent.janosgyerik.com", 80) {
+	if ping(knownNonexistentHost, testPort) {
 		t.Errorf("should be closed")
 	}
 }
 
 func Test_ping_negative_port(t*testing.T) {
-	if ping(localhost, -1) {
+	if ping(testHost, -1) {
 		t.Errorf("should be closed")
 	}
 }
 
 func Test_ping_too_high_port(t*testing.T) {
-	if ping(localhost, 123456) {
+	if ping(testHost, 123456) {
 		t.Errorf("should be closed")
 	}
 }
