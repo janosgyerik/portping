@@ -5,15 +5,12 @@ import (
 	"fmt"
 )
 
-// TODO return the error
-func Ping(host string, port int) bool {
+func Ping(host string, port int) error {
 	conn, err := net.Dial("tcp", fmt.Sprintf("%s:%d", host, port))
-	fmt.Printf("%s:%d %v", host, port, err)
 	if err == nil {
 		conn.Close()
-		return true
 	}
-	return false
+	return err
 }
 
 // TODO function to ping repeatedly
