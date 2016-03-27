@@ -36,7 +36,7 @@ func assertPingResult(host string, port int, t*testing.T, expected bool) {
 	log.Printf("port ping %s %v", addr, err)
 
 	actual := err == nil
-	
+
 	if expected != actual {
 		var openOrClosed string
 		if expected {
@@ -54,6 +54,22 @@ func assertPingSuccess(host string, port int, t*testing.T) {
 
 func assertPingFailure(host string, port int, t*testing.T) {
 	assertPingResult(host, port, t, false)
+}
+
+func assertPingNSuccessCount(host string, port int, t*testing.T, pingCount int, expectedSuccessCount int) {
+	c := make(chan error)
+	go PingN(host, port, pingCount, c)
+
+	successCount := 0
+	for i := 0; i < pingCount; i++ {
+		if <-c == nil {
+			successCount++
+		}
+	}
+
+	if expectedSuccessCount != successCount {
+		t.Errorf("expected %d successful pings, but got only %d", expectedSuccessCount, successCount)
+	}
 }
 
 func Test_ping_open_port(t*testing.T) {
@@ -79,4 +95,19 @@ func Test_ping_negative_port(t*testing.T) {
 
 func Test_ping_too_high_port(t*testing.T) {
 	assertPingFailure(testHost, 123456, t)
+}
+
+func Test_ping5_all_success(t*testing.T) {
+	count := 3
+	go acceptN(testHost, testPort, count)
+
+	assertPingNSuccessCount(testHost, testPort, t, count, count)
+}
+
+func Test_ping5_partial_success(t*testing.T) {
+	successCount := 3
+	go acceptN(testHost, testPort, successCount)
+
+	pingCount := 5
+	assertPingNSuccessCount(testHost, testPort, t, pingCount, successCount)
 }

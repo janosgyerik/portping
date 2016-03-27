@@ -3,17 +3,25 @@ package portping
 import (
 	"net"
 	"fmt"
+	"log"
 )
 
 func Ping(host string, port int) error {
-	conn, err := net.Dial("tcp", fmt.Sprintf("%s:%d", host, port))
+	addr := fmt.Sprintf("%s:%d", host, port)
+	log.Printf("port ping %s", addr)
+
+	conn, err := net.Dial("tcp", addr)
 	if err == nil {
 		conn.Close()
 	}
 	return err
 }
 
-// TODO function to ping repeatedly
+func PingN(host string, port int, count int, c chan error) {
+	for i := 0; i < count; i++ {
+		c <- Ping(host, port)
+	}
+}
 
 // TODO function to time the ping and return stats
 
