@@ -39,8 +39,14 @@ func Test_ping_nonexistent_host(t*testing.T) {
 	}
 }
 
-func Test_ping_invalid_port(t*testing.T) {
+func Test_ping_negative_port(t*testing.T) {
 	if ping(localhost, -1) {
+		t.Errorf("should be closed")
+	}
+}
+
+func Test_ping_too_high_port(t*testing.T) {
+	if ping(localhost, 123456) {
 		t.Errorf("should be closed")
 	}
 }
