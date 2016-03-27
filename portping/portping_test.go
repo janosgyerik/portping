@@ -32,8 +32,6 @@ func acceptN(host string, port int, count int) {
 
 func assertPingResult(host string, port int, t*testing.T, expected bool) {
 	err := Ping(host, port)
-	addr := fmt.Sprintf("%s:%d", host, port)
-	log.Printf("port ping %s %v", addr, err)
 
 	actual := err == nil
 
@@ -44,7 +42,7 @@ func assertPingResult(host string, port int, t*testing.T, expected bool) {
 		} else {
 			openOrClosed = "closed"
 		}
-		t.Errorf("%s should be %s", addr, openOrClosed)
+		t.Errorf("%s:%d should be %s", host, port, openOrClosed)
 	}
 }
 

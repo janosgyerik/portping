@@ -8,9 +8,10 @@ import (
 
 func Ping(host string, port int) error {
 	addr := fmt.Sprintf("%s:%d", host, port)
-	log.Printf("port ping %s", addr)
-
 	conn, err := net.Dial("tcp", addr)
+
+	log.Printf("port ping %s -> %v", addr, err)
+
 	if err == nil {
 		conn.Close()
 	}
