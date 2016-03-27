@@ -102,6 +102,12 @@ func Test_ping5_all_success(t*testing.T) {
 	assertPingNSuccessCount(testHost, testPort, t, count, count)
 }
 
+func Test_ping5_all_fail(t*testing.T) {
+	pingCount := 5
+	successCount := 0
+	assertPingNSuccessCount(testHost, testPort, t, pingCount, successCount)
+}
+
 func Test_ping5_partial_success(t*testing.T) {
 	successCount := 3
 	go acceptN(testHost, testPort, successCount)
@@ -109,3 +115,4 @@ func Test_ping5_partial_success(t*testing.T) {
 	pingCount := 5
 	assertPingNSuccessCount(testHost, testPort, t, pingCount, successCount)
 }
+
