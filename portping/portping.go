@@ -7,9 +7,13 @@ import (
 
 // TODO return the error
 func Ping(host string, port int) bool {
-	_, err := net.Dial("tcp", fmt.Sprintf("%s:%d", host, port))
+	conn, err := net.Dial("tcp", fmt.Sprintf("%s:%d", host, port))
 	fmt.Printf("%s:%d %v", host, port, err)
-	return err == nil
+	if err == nil {
+		conn.Close()
+		return true
+	}
+	return false
 }
 
 // TODO function to ping repeatedly
