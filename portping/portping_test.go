@@ -96,10 +96,10 @@ func Test_ping_too_high_port(t*testing.T) {
 }
 
 func Test_ping5_all_success(t*testing.T) {
-	count := 3
-	go acceptN(testHost, testPort, count)
+	pingCount := 3
+	go acceptN(testHost, testPort, pingCount)
 
-	assertPingNSuccessCount(testHost, testPort, t, count, count)
+	assertPingNSuccessCount(testHost, testPort, t, pingCount, pingCount)
 }
 
 func Test_ping5_all_fail(t*testing.T) {
