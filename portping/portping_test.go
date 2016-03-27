@@ -20,6 +20,7 @@ func acceptN(host string, port int, count int) {
 		log.Fatal(err)
 	}
 	defer ln.Close()
+
 	for i := 0; i < count; i++ {
 		conn, err := ln.Accept()
 		if err != nil {
@@ -35,6 +36,7 @@ func assertPingResult(host string, port int, t*testing.T, expected bool) {
 	log.Printf("port ping %s %v", addr, err)
 
 	actual := err == nil
+	
 	if expected != actual {
 		var openOrClosed string
 		if expected {
