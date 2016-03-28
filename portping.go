@@ -1,4 +1,4 @@
-package portping
+package main
 
 import (
 	"net"
