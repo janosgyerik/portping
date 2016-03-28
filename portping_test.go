@@ -157,3 +157,8 @@ func Test_format_result_invalid_port_123456(t*testing.T) {
 	port := 123456
 	assertFormatResult(testHost, port, t, fmt.Sprintf("invalid port %d", port))
 }
+
+func Test_format_result_nonexistent_host(t*testing.T) {
+	host := knownNonexistentHost
+	assertFormatResult(host, testPort, t, fmt.Sprintf("lookup %s: no such host", host))
+}
