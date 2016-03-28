@@ -43,6 +43,8 @@ func main() {
 	c := make(chan error)
 	go PingN(host, port, *countPtr, c)
 
+	allSuccessful := true
+
 	for i := 0; i < *countPtr; i++ {
 		// TODO print details only if verbose, otherwise print just OpError.Err
 		var msg string
@@ -50,6 +52,7 @@ func main() {
 			msg = "success"
 		} else {
 			msg = err.Error()
+			allSuccessful = false
 		}
 		// TODO add time
 		fmt.Printf("port ping %s [%d] -> %s\n", addr, i + 1, msg)
@@ -59,4 +62,8 @@ func main() {
 	// --- host:port ping statistics ---
 	// n connections attempted, m successful, x% failed
 	// round-trip min/avg/max/stddev = a/b/c/d ms
+
+	if !allSuccessful {
+		os.Exit(1)
+	}
 }
