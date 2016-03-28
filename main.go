@@ -76,7 +76,7 @@ func main() {
 			allSuccessful = false
 		}
 		// TODO add time
-		fmt.Printf("port ping %s [%d] -> %s\n", addr, i + 1, msg)
+		fmt.Printf("%s [%d] -> %s\n", addr, i + 1, msg)
 	}
 
 	// TODO print summary
