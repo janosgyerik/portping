@@ -12,6 +12,8 @@ import (
 // flag: -W timeout
 // drop default count, print forever, until cancel with Control-C, and print stats
 
+const defaultCount = 5
+
 func exit() {
 	flag.Usage()
 	os.Exit(1)
@@ -29,7 +31,7 @@ func parseArgs() Params {
 		flag.PrintDefaults()
 	}
 
-	countPtr := flag.Int("count", 5, "stop after count connections")
+	countPtr := flag.Int("count", defaultCount, "stop after count connections")
 	flag.Parse()
 
 	if len(flag.Args()) < 2 {
