@@ -10,7 +10,6 @@ import (
 // TODO
 // flags: --tcp, --udp; default is tcp
 // flag: -W timeout
-
 // drop default count, print forever, until cancel with Control-C, and print stats
 
 func exit() {
@@ -18,7 +17,13 @@ func exit() {
 	os.Exit(1)
 }
 
-func main() {
+type Params struct {
+	host  string
+	port  int
+	count int
+}
+
+func parseArgs() Params {
 	flag.Usage = func() {
 		fmt.Printf("Usage: %s [options] host port\n\n", os.Args[0])
 		flag.PrintDefaults()
@@ -37,15 +42,29 @@ func main() {
 		exit()
 	}
 
+	return Params{
+		host: host,
+		port: port,
+		count: *countPtr,
+	}
+}
+
+func main() {
+	params := parseArgs()
+
+	host := params.host
+	port := params.port
+	count := params.count
+
 	addr := fmt.Sprintf("%s:%d", host, port)
 	fmt.Printf("Starting to ping %s ...\n", addr)
 
 	c := make(chan error)
-	go PingN(host, port, *countPtr, c)
+	go PingN(host, port, count, c)
 
 	allSuccessful := true
 
-	for i := 0; i < *countPtr; i++ {
+	for i := 0; i < count; i++ {
 		// TODO print details only if verbose, otherwise print just OpError.Err
 		var msg string
 		if err := <-c; err == nil {
