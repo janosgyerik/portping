@@ -1,34 +1,62 @@
 package main
 
+import (
+	"flag"
+	"fmt"
+	"os"
+	"strconv"
+)
+
 // TODO
-// args: host, port
-
-// output:
-// Port ping host:port
-// Successful connection to host:port time=201ms
-// Successful connection to host:port time=195ms
-// Successful connection to host:port time=198ms
-// --- host:port ping statistics ---
-// n connections attempted, m successful, x% failed
-// round-trip min/avg/max/stddev = a/b/c/d ms
-
-// error output:
-// portping: cannot resolve host: Unknown host
-// portping: connect to address host: Connection refused
-
-// flag: -c count
 // flags: --tcp, --udp; default is tcp
 // flag: -W timeout
 
-// test with: 192.168.1.10
-//tcp        0      0 127.0.1.1:53            0.0.0.0:*               LISTEN
-//tcp        0      0 0.0.0.0:22              0.0.0.0:*               LISTEN
-//tcp        0      0 127.0.0.1:631           0.0.0.0:*               LISTEN
-//tcp        0      0 127.0.0.1:8089          0.0.0.0:*               LISTEN
-//tcp6       0      0 :::22                   :::*                    LISTEN
-//tcp6       0      0 ::1:631                 :::*                    LISTEN
-
 // drop default count, print forever, until cancel with Control-C, and print stats
 
+func exit() {
+	flag.Usage()
+	os.Exit(1)
+}
+
 func main() {
+	flag.Usage = func() {
+		fmt.Printf("Usage: %s [options] host port\n\n", os.Args[0])
+		flag.PrintDefaults()
+	}
+
+	countPtr := flag.Int("count", 5, "stop after count connections")
+	flag.Parse()
+
+	if len(flag.Args()) < 2 {
+		exit()
+	}
+
+	host := flag.Args()[0]
+	port, parseErr := strconv.Atoi(flag.Args()[1])
+	if parseErr != nil {
+		exit()
+	}
+
+	addr := fmt.Sprintf("%s:%d", host, port)
+	fmt.Printf("Starting to ping %s ...\n", addr)
+
+	c := make(chan error)
+	go PingN(host, port, *countPtr, c)
+
+	for i := 0; i < *countPtr; i++ {
+		// TODO print details only if verbose, otherwise print just OpError.Err
+		var msg string
+		if err := <-c; err == nil {
+			msg = "success"
+		} else {
+			msg = err.Error()
+		}
+		// TODO add time
+		fmt.Printf("port ping %s [%d] -> %s\n", addr, i + 1, msg)
+	}
+
+	// TODO print summary
+	// --- host:port ping statistics ---
+	// n connections attempted, m successful, x% failed
+	// round-trip min/avg/max/stddev = a/b/c/d ms
 }
