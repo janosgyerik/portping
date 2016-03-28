@@ -3,11 +3,7 @@ package main
 import (
 	"net"
 	"fmt"
-	"regexp"
 )
-
-var pattern_getsockopt = regexp.MustCompile(`getsockopt: (.*)`)
-var pattern_other = regexp.MustCompile(`^dial tcp: (.*)`)
 
 func Ping(host string, port int) error {
 	addr := fmt.Sprintf("%s:%d", host, port)
@@ -29,12 +25,10 @@ func FormatResult(err error) string {
 	if err == nil {
 		return "success"
 	}
-	s := err.Error()
-	if result := pattern_getsockopt.FindStringSubmatch(s); result != nil {
-		return result[1]
+	switch err := err.(type) {
+	case *net.OpError:
+		return err.Err.Error()
+	default:
+		return err.Error()
 	}
-	if result := pattern_other.FindStringSubmatch(s); result != nil {
-		return result[1]
-	}
-	return s
 }

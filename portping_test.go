@@ -145,7 +145,7 @@ func Test_format_result_success(t*testing.T) {
 }
 
 func Test_format_result_connection_refused(t*testing.T) {
-	assertFormatResult(testHost, testPort, t, "connection refused")
+	assertFormatResult(testHost, testPort, t, "getsockopt: connection refused")
 }
 
 func Test_format_result_invalid_port_m1(t*testing.T) {
