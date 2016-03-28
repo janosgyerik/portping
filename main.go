@@ -10,6 +10,7 @@ import (
 // TODO
 // flags: --tcp, --udp; default is tcp
 // flag: -W timeout
+// flag: -v verbose; default=false
 // drop default count, print forever, until cancel with Control-C, and print stats
 
 const defaultCount = 5
@@ -67,16 +68,12 @@ func main() {
 	allSuccessful := true
 
 	for i := 0; i < count; i++ {
-		// TODO print details only if verbose, otherwise print just OpError.Err
-		var msg string
-		if err := <-c; err == nil {
-			msg = "success"
-		} else {
-			msg = err.Error()
+		// TODO add time
+		err := <-c
+		if err != nil {
 			allSuccessful = false
 		}
-		// TODO add time
-		fmt.Printf("%s [%d] -> %s\n", addr, i + 1, msg)
+		fmt.Printf("%s [%d] -> %s\n", addr, i + 1, FormatResult(err))
 	}
 
 	// TODO print summary
