@@ -132,3 +132,28 @@ func Test_ping5_partial_success(t*testing.T) {
 	assertPingNSuccessCount(testHost, testPort, t, pingCount, successCount)
 }
 
+func assertFormatResult(host string, port int, t*testing.T, expected string) {
+	actual := FormatResult(Ping(host, port))
+	if expected != actual {
+		t.Errorf("expected '%s' but got '%s'", expected, actual)
+	}
+}
+
+func Test_format_result_success(t*testing.T) {
+	go acceptN(testHost, testPort, 1)
+	assertFormatResult(testHost, testPort, t, "success")
+}
+
+func Test_format_result_connection_refused(t*testing.T) {
+	assertFormatResult(testHost, testPort, t, "connection refused")
+}
+
+func Test_format_result_invalid_port_m1(t*testing.T) {
+	port := -1
+	assertFormatResult(testHost, port, t, fmt.Sprintf("invalid port %d", port))
+}
+
+func Test_format_result_invalid_port_123456(t*testing.T) {
+	port := 123456
+	assertFormatResult(testHost, port, t, fmt.Sprintf("invalid port %d", port))
+}
