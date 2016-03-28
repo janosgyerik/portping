@@ -34,6 +34,9 @@ func acceptN(host string, port int, count int) {
 func assertPingResult(host string, port int, t*testing.T, expected bool, pattern string) {
 	err := Ping(host, port)
 
+	addr := fmt.Sprintf("%s:%d", host, port)
+	log.Printf("port ping %s -> %v", addr, err)
+
 	actual := err == nil
 
 	if expected != actual {
