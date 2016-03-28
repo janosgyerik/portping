@@ -38,7 +38,3 @@ func FormatResult(err error) string {
 	}
 	return s
 }
-
-// TODO function to time the ping and return stats
-
-// TODO functions to build total stats, aggregates
