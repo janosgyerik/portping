@@ -32,7 +32,7 @@ func parseArgs() Params {
 		flag.PrintDefaults()
 	}
 
-	countPtr := flag.Int("count", defaultCount, "stop after count connections")
+	countPtr := flag.Int("c", defaultCount, "stop after count connections")
 	flag.Parse()
 
 	if len(flag.Args()) < 2 {
