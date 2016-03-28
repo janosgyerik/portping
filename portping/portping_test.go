@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net"
 	"log"
+	"strings"
 )
 
 const testHost = "localhost"
@@ -30,7 +31,7 @@ func acceptN(host string, port int, count int) {
 	}
 }
 
-func assertPingResult(host string, port int, t*testing.T, expected bool) {
+func assertPingResult(host string, port int, t*testing.T, expected bool, pattern string) {
 	err := Ping(host, port)
 
 	actual := err == nil
@@ -44,14 +45,21 @@ func assertPingResult(host string, port int, t*testing.T, expected bool) {
 		}
 		t.Errorf("%s:%d should be %s", host, port, openOrClosed)
 	}
+
+	if pattern != "" {
+		errstr := err.Error()
+		if !strings.Contains(errstr, pattern) {
+			t.Errorf("the result was expected to contain %s, but was: %s", pattern, errstr)
+		}
+	}
 }
 
 func assertPingSuccess(host string, port int, t*testing.T) {
-	assertPingResult(host, port, t, true)
+	assertPingResult(host, port, t, true, "")
 }
 
-func assertPingFailure(host string, port int, t*testing.T) {
-	assertPingResult(host, port, t, false)
+func assertPingFailure(host string, port int, t*testing.T, pattern string) {
+	assertPingResult(host, port, t, false, pattern)
 }
 
 func assertPingNSuccessCount(host string, port int, t*testing.T, pingCount int, expectedSuccessCount int) {
@@ -76,23 +84,23 @@ func Test_ping_open_port(t*testing.T) {
 	assertPingSuccess(testHost, testPort, t)
 
 	// for sanity: acceptN should have shut down already
-	assertPingFailure(testHost, testPort, t)
+	assertPingFailure(testHost, testPort, t, "connection refused")
 }
 
 func Test_ping_unopen_port(t*testing.T) {
-	assertPingFailure(testHost, testPort, t)
+	assertPingFailure(testHost, testPort, t, "connection refused")
 }
 
 func Test_ping_nonexistent_host(t*testing.T) {
-	assertPingFailure(knownNonexistentHost, testPort, t)
+	assertPingFailure(knownNonexistentHost, testPort, t, "no such host")
 }
 
 func Test_ping_negative_port(t*testing.T) {
-	assertPingFailure(testHost, -1, t)
+	assertPingFailure(testHost, -1, t, "invalid port")
 }
 
 func Test_ping_too_high_port(t*testing.T) {
-	assertPingFailure(testHost, 123456, t)
+	assertPingFailure(testHost, 123456, t, "invalid port")
 }
 
 func Test_ping5_all_success(t*testing.T) {
