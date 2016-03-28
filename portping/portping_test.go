@@ -69,9 +69,14 @@ func assertPingNSuccessCount(host string, port int, t*testing.T, pingCount int, 
 	c := make(chan error)
 	go PingN(host, port, pingCount, c)
 
+	addr := fmt.Sprintf("%s:%d", host, port)
+
 	successCount := 0
 	for i := 0; i < pingCount; i++ {
-		if <-c == nil {
+		err := <-c
+		log.Printf("port ping %s [%d] -> %v", addr, i + 1, err)
+
+		if err == nil {
 			successCount++
 		}
 	}
