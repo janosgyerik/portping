@@ -4,7 +4,6 @@ import (
 	"testing"
 	"fmt"
 	"net"
-	"log"
 	"strings"
 )
 
@@ -35,7 +34,7 @@ func assertPingResult(host string, port int, t*testing.T, expected bool, pattern
 	err := Ping(host, port)
 
 	addr := fmt.Sprintf("%s:%d", host, port)
-	log.Printf("port ping %s -> %v", addr, err)
+	t.Logf("port ping %s -> %v", addr, err)
 
 	actual := err == nil
 
@@ -74,7 +73,7 @@ func assertPingNSuccessCount(host string, port int, t*testing.T, pingCount int, 
 	successCount := 0
 	for i := 0; i < pingCount; i++ {
 		err := <-c
-		log.Printf("port ping %s [%d] -> %v", addr, i + 1, err)
+		t.Logf("port ping %s [%d] -> %v", addr, i + 1, err)
 
 		if err == nil {
 			successCount++
