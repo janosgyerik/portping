@@ -2,20 +2,26 @@ package main
 
 import (
 	"net"
-	"fmt"
+	"time"
 )
 
-func Ping(host string, port int) error {
-	addr := fmt.Sprintf("%s:%d", host, port)
-	conn, err := net.Dial("tcp", addr)
-
-	if err == nil {
-		conn.Close()
+func Ping(host, port string) error {
+	addr := net.JoinHostPort(host, port)
+	a, err := net.ResolveTCPAddr("tcp", addr)
+	if err != nil {
+		return err
 	}
-	return err
+	conn, err := net.DialTimeout(a.Network(), a.String(), 10*time.Second)
+	if conn != nil {
+		defer conn.Close()
+	}
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
-func PingN(host string, port int, count int, c chan error) {
+func PingN(host, port string, count int, c chan error) {
 	for i := 0; i < count; i++ {
 		c <- Ping(host, port)
 	}

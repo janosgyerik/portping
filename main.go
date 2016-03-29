@@ -4,7 +4,6 @@ import (
 	"flag"
 	"fmt"
 	"os"
-	"strconv"
 )
 
 // TODO
@@ -22,7 +21,7 @@ func exit() {
 
 type Params struct {
 	host  string
-	port  int
+	port  string
 	count int
 }
 
@@ -40,10 +39,7 @@ func parseArgs() Params {
 	}
 
 	host := flag.Args()[0]
-	port, parseErr := strconv.Atoi(flag.Args()[1])
-	if parseErr != nil {
-		exit()
-	}
+	port := flag.Args()[1]
 
 	return Params{
 		host: host,
