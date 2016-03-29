@@ -30,7 +30,7 @@ func acceptN(t*testing.T, host string, port int, count int) {
 	}
 }
 
-func assertPingResult(host string, port int, t*testing.T, expected bool, pattern string) {
+func assertPingResult(t*testing.T, host string, port int, expected bool, pattern string) {
 	err := Ping(host, port)
 
 	addr := fmt.Sprintf("%s:%d", host, port)
@@ -56,15 +56,15 @@ func assertPingResult(host string, port int, t*testing.T, expected bool, pattern
 	}
 }
 
-func assertPingSuccess(host string, port int, t*testing.T) {
-	assertPingResult(host, port, t, true, "")
+func assertPingSuccess(t*testing.T, host string, port int) {
+	assertPingResult(t, host, port, true, "")
 }
 
-func assertPingFailure(host string, port int, t*testing.T, pattern string) {
-	assertPingResult(host, port, t, false, pattern)
+func assertPingFailure(t*testing.T, host string, port int, pattern string) {
+	assertPingResult(t, host, port, false, pattern)
 }
 
-func assertPingNSuccessCount(host string, port int, t*testing.T, pingCount int, expectedSuccessCount int) {
+func assertPingNSuccessCount(t*testing.T, host string, port int, pingCount int, expectedSuccessCount int) {
 	c := make(chan error)
 	go PingN(host, port, pingCount, c)
 
@@ -88,39 +88,39 @@ func assertPingNSuccessCount(host string, port int, t*testing.T, pingCount int, 
 func Test_ping_open_port(t*testing.T) {
 	go acceptN(t, testHost, testPort, 1)
 
-	assertPingSuccess(testHost, testPort, t)
+	assertPingSuccess(t, testHost, testPort)
 
 	// for sanity: acceptN should have shut down already
-	assertPingFailure(testHost, testPort, t, "connection refused")
+	assertPingFailure(t, testHost, testPort, "connection refused")
 }
 
 func Test_ping_unopen_port(t*testing.T) {
-	assertPingFailure(testHost, testPort, t, "connection refused")
+	assertPingFailure(t, testHost, testPort, "connection refused")
 }
 
 func Test_ping_nonexistent_host(t*testing.T) {
-	assertPingFailure(knownNonexistentHost, testPort, t, "no such host")
+	assertPingFailure(t, knownNonexistentHost, testPort, "no such host")
 }
 
 func Test_ping_negative_port(t*testing.T) {
-	assertPingFailure(testHost, -1, t, "invalid port")
+	assertPingFailure(t, testHost, -1, "invalid port")
 }
 
 func Test_ping_too_high_port(t*testing.T) {
-	assertPingFailure(testHost, 123456, t, "invalid port")
+	assertPingFailure(t, testHost, 123456, "invalid port")
 }
 
 func Test_ping5_all_success(t*testing.T) {
 	pingCount := 3
 	go acceptN(t, testHost, testPort, pingCount)
 
-	assertPingNSuccessCount(testHost, testPort, t, pingCount, pingCount)
+	assertPingNSuccessCount(t, testHost, testPort, pingCount, pingCount)
 }
 
 func Test_ping5_all_fail(t*testing.T) {
 	pingCount := 5
 	successCount := 0
-	assertPingNSuccessCount(testHost, testPort, t, pingCount, successCount)
+	assertPingNSuccessCount(t, testHost, testPort, pingCount, successCount)
 }
 
 func Test_ping5_partial_success(t*testing.T) {
@@ -128,10 +128,10 @@ func Test_ping5_partial_success(t*testing.T) {
 	go acceptN(t, testHost, testPort, successCount)
 
 	pingCount := 5
-	assertPingNSuccessCount(testHost, testPort, t, pingCount, successCount)
+	assertPingNSuccessCount(t, testHost, testPort, pingCount, successCount)
 }
 
-func assertFormatResult(host string, port int, t*testing.T, expected string) {
+func assertFormatResult(t*testing.T, host string, port int, expected string) {
 	actual := FormatResult(Ping(host, port))
 	if expected != actual {
 		t.Errorf("expected '%s' but got '%s'", expected, actual)
@@ -140,24 +140,24 @@ func assertFormatResult(host string, port int, t*testing.T, expected string) {
 
 func Test_format_result_success(t*testing.T) {
 	go acceptN(t, testHost, testPort, 1)
-	assertFormatResult(testHost, testPort, t, "success")
+	assertFormatResult(t, testHost, testPort, "success")
 }
 
 func Test_format_result_connection_refused(t*testing.T) {
-	assertFormatResult(testHost, testPort, t, "getsockopt: connection refused")
+	assertFormatResult(t, testHost, testPort, "getsockopt: connection refused")
 }
 
 func Test_format_result_invalid_port_m1(t*testing.T) {
 	port := -1
-	assertFormatResult(testHost, port, t, fmt.Sprintf("invalid port %d", port))
+	assertFormatResult(t, testHost, port, fmt.Sprintf("invalid port %d", port))
 }
 
 func Test_format_result_invalid_port_123456(t*testing.T) {
 	port := 123456
-	assertFormatResult(testHost, port, t, fmt.Sprintf("invalid port %d", port))
+	assertFormatResult(t, testHost, port, fmt.Sprintf("invalid port %d", port))
 }
 
 func Test_format_result_nonexistent_host(t*testing.T) {
 	host := knownNonexistentHost
-	assertFormatResult(host, testPort, t, fmt.Sprintf("lookup %s: no such host", host))
+	assertFormatResult(t, host, testPort, fmt.Sprintf("lookup %s: no such host", host))
 }
