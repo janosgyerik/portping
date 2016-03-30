@@ -32,7 +32,7 @@ func acceptN(t*testing.T, host, port string, count int, ready chan bool) {
 	}
 }
 
-func assertPingResult(t*testing.T, host, port string, expected bool, pattern string) {
+func assertPingResult(t*testing.T, host, port string, expected bool, patterns ...string) {
 	err := Ping(host, port)
 
 	addr := net.JoinHostPort(host, port)
@@ -50,10 +50,17 @@ func assertPingResult(t*testing.T, host, port string, expected bool, pattern str
 		t.Errorf("%s should be %s", addr, openOrClosed)
 	}
 
-	if pattern != "" && err != nil {
-		actual := err.Error()
-		if !strings.Contains(actual, pattern) {
-			t.Errorf("got '%s'; expected to contain '%s'", actual, pattern)
+	if err != nil {
+		result := FormatResult(err)
+		foundMatch := false
+		for _, pattern := range patterns {
+			if strings.Contains(result, pattern) {
+				foundMatch = true
+				break
+			}
+		}
+		if !foundMatch {
+			t.Errorf("got '%s'; expected to contain one of '%s'", result, patterns)
 		}
 	}
 }
@@ -62,8 +69,8 @@ func assertPingSuccess(t*testing.T, host, port string) {
 	assertPingResult(t, host, port, true, "")
 }
 
-func assertPingFailure(t*testing.T, host, port string, pattern string) {
-	assertPingResult(t, host, port, false, pattern)
+func assertPingFailure(t*testing.T, host, port string, patterns ...string) {
+	assertPingResult(t, host, port, false, patterns...)
 }
 
 func assertPingNSuccessCount(t*testing.T, host, port string, pingCount int, expectedSuccessCount int) {
@@ -107,11 +114,11 @@ func Test_ping_nonexistent_host(t*testing.T) {
 }
 
 func Test_ping_negative_port(t*testing.T) {
-	assertPingFailure(t, testHost, "-1", "invalid port")
+	assertPingFailure(t, testHost, "-1", "invalid port", "unknown port")
 }
 
 func Test_ping_too_high_port(t*testing.T) {
-	assertPingFailure(t, testHost, "123456", "invalid port")
+	assertPingFailure(t, testHost, "123456", "invalid port", "unknown port")
 }
 
 func Test_ping5_all_success(t*testing.T) {
