@@ -139,10 +139,10 @@ func Test_ping5_partial_success(t*testing.T) {
 	assertPingNSuccessCount(t, testHost, testPort, pingCount, successCount)
 }
 
-func assertFormatResult(t*testing.T, host, port string, expected string) {
-	actual := FormatResult(Ping(host, port))
-	if actual != expected {
-		t.Errorf("expected '%s' but got '%s'", expected, actual)
+func assertFormatResultContains(t*testing.T, host, port string, pattern string) {
+	result := FormatResult(Ping(host, port))
+	if !strings.Contains(result, pattern) {
+		t.Errorf("got '%s'; expected to contain '%s'", result, pattern)
 	}
 }
 
@@ -150,24 +150,24 @@ func Test_format_result_success(t*testing.T) {
 	ready := make(chan bool)
 	go acceptN(t, testHost, testPort, 1, ready)
 	<-ready
-	assertFormatResult(t, testHost, testPort, "success")
+	assertFormatResultContains(t, testHost, testPort, "success")
 }
 
 func Test_format_result_connection_refused(t*testing.T) {
-	assertFormatResult(t, testHost, testPort, "getsockopt: connection refused")
+	assertFormatResultContains(t, testHost, testPort, "connection refused")
 }
 
 func Test_format_result_invalid_port_m1(t*testing.T) {
 	port := "-1"
-	assertFormatResult(t, testHost, port, fmt.Sprintf("invalid port %s", port))
+	assertFormatResultContains(t, testHost, port, fmt.Sprintf("invalid port %s", port))
 }
 
 func Test_format_result_invalid_port_123456(t*testing.T) {
 	port := "123456"
-	assertFormatResult(t, testHost, port, fmt.Sprintf("invalid port %s", port))
+	assertFormatResultContains(t, testHost, port, fmt.Sprintf("invalid port %s", port))
 }
 
 func Test_format_result_nonexistent_host(t*testing.T) {
 	host := knownNonexistentHost
-	assertFormatResult(t, host, testPort, fmt.Sprintf("lookup %s: no such host", host))
+	assertFormatResultContains(t, host, testPort, fmt.Sprintf("lookup %s: no such host", host))
 }
