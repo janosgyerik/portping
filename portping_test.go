@@ -51,9 +51,9 @@ func assertPingResult(t*testing.T, host, port string, expected bool, pattern str
 	}
 
 	if pattern != "" {
-		errstr := err.Error()
-		if !strings.Contains(errstr, pattern) {
-			t.Errorf("the result was expected to contain %s, but was: %s", pattern, errstr)
+		actual := err.Error()
+		if !strings.Contains(actual, pattern) {
+			t.Errorf("got '%s'; expected to contain '%s'", actual, pattern)
 		}
 	}
 }
