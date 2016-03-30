@@ -40,7 +40,7 @@ func assertPingResult(t*testing.T, host, port string, expected bool, pattern str
 
 	actual := err == nil
 
-	if expected != actual {
+	if actual != expected {
 		var openOrClosed string
 		if expected {
 			openOrClosed = "open"
@@ -141,7 +141,7 @@ func Test_ping5_partial_success(t*testing.T) {
 
 func assertFormatResult(t*testing.T, host, port string, expected string) {
 	actual := FormatResult(Ping(host, port))
-	if expected != actual {
+	if actual != expected {
 		t.Errorf("expected '%s' but got '%s'", expected, actual)
 	}
 }
