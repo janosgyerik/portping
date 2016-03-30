@@ -14,14 +14,15 @@ const testPort = "1234"
 
 const knownNonexistentHost = "nonexistent.janosgyerik.com"
 
-func acceptN(t*testing.T, host, port string, count int, ready chan int) {
+func acceptN(t*testing.T, host, port string, count int, ready chan bool) {
 	ln, err := net.Listen("tcp", net.JoinHostPort(host, port))
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer ln.Close()
 
-	ready <- 1
+	ready <- true
+
 	for i := 0; i < count; i++ {
 		conn, err := ln.Accept()
 		if err != nil {
@@ -87,7 +88,7 @@ func assertPingNSuccessCount(t*testing.T, host, port string, pingCount int, expe
 }
 
 func Test_ping_open_port(t*testing.T) {
-	ready := make(chan int)
+	ready := make(chan bool)
 	go acceptN(t, testHost, testPort, 1, ready)
 	<-ready
 
@@ -115,7 +116,7 @@ func Test_ping_too_high_port(t*testing.T) {
 
 func Test_ping5_all_success(t*testing.T) {
 	pingCount := 3
-	ready := make(chan int)
+	ready := make(chan bool)
 	go acceptN(t, testHost, testPort, pingCount, ready)
 	<-ready
 
@@ -130,7 +131,7 @@ func Test_ping5_all_fail(t*testing.T) {
 
 func Test_ping5_partial_success(t*testing.T) {
 	successCount := 3
-	ready := make(chan int)
+	ready := make(chan bool)
 	go acceptN(t, testHost, testPort, successCount, ready)
 	<-ready
 
@@ -146,9 +147,8 @@ func assertFormatResult(t*testing.T, host, port string, expected string) {
 }
 
 func Test_format_result_success(t*testing.T) {
-	ready := make(chan int)
+	ready := make(chan bool)
 	go acceptN(t, testHost, testPort, 1, ready)
-
 	<-ready
 	assertFormatResult(t, testHost, testPort, "success")
 }
