@@ -79,16 +79,17 @@ func assertPingNSuccessCount(t*testing.T, host, port string, pingCount int, expe
 
 	addr := net.JoinHostPort(host, port)
 
-	successCount := 0
+	failureCount := 0
 	for i := 0; i < pingCount; i++ {
 		err := <-c
 		t.Logf("port ping %s [%d] -> %v", addr, i + 1, err)
 
-		if err == nil {
-			successCount++
+		if err != nil {
+			failureCount++
 		}
 	}
 
+	successCount := pingCount - failureCount
 	if expectedSuccessCount != successCount {
 		t.Errorf("expected %d successful pings, but got only %d", expectedSuccessCount, successCount)
 	}
