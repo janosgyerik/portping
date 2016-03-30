@@ -139,10 +139,17 @@ func Test_ping5_partial_success(t*testing.T) {
 	assertPingNSuccessCount(t, testHost, testPort, pingCount, successCount)
 }
 
-func assertFormatResultContains(t*testing.T, host, port string, pattern string) {
+func assertFormatResultContains(t*testing.T, host, port string, patterns ...string) {
 	result := FormatResult(Ping(host, port))
-	if !strings.Contains(result, pattern) {
-		t.Errorf("got '%s'; expected to contain '%s'", result, pattern)
+	foundMatch := false
+	for _, pattern := range patterns {
+		if strings.Contains(result, pattern) {
+			foundMatch = true
+			break
+		}
+	}
+	if !foundMatch {
+		t.Errorf("got '%s'; expected to contain one of '%s'", result, patterns)
 	}
 }
 
@@ -158,11 +165,11 @@ func Test_format_result_connection_refused(t*testing.T) {
 }
 
 func Test_format_result_invalid_port_m1(t*testing.T) {
-	assertFormatResultContains(t, testHost, "-1", "invalid port")
+	assertFormatResultContains(t, testHost, "-1", "invalid port", "unknown port")
 }
 
 func Test_format_result_invalid_port_123456(t*testing.T) {
-	assertFormatResultContains(t, testHost, "123456", "invalid port")
+	assertFormatResultContains(t, testHost, "123456", "invalid port", "unknown port")
 }
 
 func Test_format_result_nonexistent_host(t*testing.T) {
