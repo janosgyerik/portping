@@ -158,13 +158,11 @@ func Test_format_result_connection_refused(t*testing.T) {
 }
 
 func Test_format_result_invalid_port_m1(t*testing.T) {
-	port := "-1"
-	assertFormatResultContains(t, testHost, port, fmt.Sprintf("invalid port %s", port))
+	assertFormatResultContains(t, testHost, "-1", "invalid port")
 }
 
 func Test_format_result_invalid_port_123456(t*testing.T) {
-	port := "123456"
-	assertFormatResultContains(t, testHost, port, fmt.Sprintf("invalid port %s", port))
+	assertFormatResultContains(t, testHost, "123456", "invalid port")
 }
 
 func Test_format_result_nonexistent_host(t*testing.T) {
