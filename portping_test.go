@@ -50,7 +50,7 @@ func assertPingResult(t*testing.T, host, port string, expected bool, pattern str
 		t.Errorf("%s should be %s", addr, openOrClosed)
 	}
 
-	if pattern != "" {
+	if pattern != "" && err != nil {
 		actual := err.Error()
 		if !strings.Contains(actual, pattern) {
 			t.Errorf("got '%s'; expected to contain '%s'", actual, pattern)
