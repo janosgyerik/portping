@@ -1,3 +1,4 @@
+// Command line interface to ping ports
 package main
 
 import (
