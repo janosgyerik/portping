@@ -14,22 +14,26 @@ const testPort = "1234"
 
 const knownNonexistentHost = "nonexistent.janosgyerik.com"
 
-func acceptN(t*testing.T, host, port string, count int, ready chan bool) {
-	ln, err := net.Listen("tcp", net.JoinHostPort(host, port))
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer ln.Close()
-
-	ready <- true
-
-	for i := 0; i < count; i++ {
-		conn, err := ln.Accept()
+func acceptN(t*testing.T, host, port string, count int) {
+	ready := make(chan bool)
+	go func() {
+		ln, err := net.Listen("tcp", net.JoinHostPort(host, port))
 		if err != nil {
 			t.Fatal(err)
 		}
-		conn.Close()
-	}
+		defer ln.Close()
+
+		ready <- true
+
+		for i := 0; i < count; i++ {
+			conn, err := ln.Accept()
+			if err != nil {
+				t.Fatal(err)
+			}
+			conn.Close()
+		}
+	}()
+	<-ready
 }
 
 func assertPingResult(t*testing.T, host, port string, expected bool, patterns ...string) {
@@ -86,9 +90,7 @@ func assertPingNSuccessCount(t*testing.T, host, port string, pingCount int, expe
 }
 
 func Test_ping_open_port(t*testing.T) {
-	ready := make(chan bool)
-	go acceptN(t, testHost, testPort, 1, ready)
-	<-ready
+	acceptN(t, testHost, testPort, 1)
 
 	assertPingSuccess(t, testHost, testPort)
 
@@ -114,9 +116,7 @@ func Test_ping_too_high_port(t*testing.T) {
 
 func Test_ping5_all_success(t*testing.T) {
 	pingCount := 3
-	ready := make(chan bool)
-	go acceptN(t, testHost, testPort, pingCount, ready)
-	<-ready
+	acceptN(t, testHost, testPort, pingCount)
 
 	assertPingNSuccessCount(t, testHost, testPort, pingCount, pingCount)
 }
@@ -129,9 +129,7 @@ func Test_ping5_all_fail(t*testing.T) {
 
 func Test_ping5_partial_success(t*testing.T) {
 	successCount := 3
-	ready := make(chan bool)
-	go acceptN(t, testHost, testPort, successCount, ready)
-	<-ready
+	acceptN(t, testHost, testPort, successCount)
 
 	pingCount := 5
 	assertPingNSuccessCount(t, testHost, testPort, pingCount, successCount)
@@ -156,9 +154,7 @@ func pingAndAssertFormatResultContains(t*testing.T, host, port string, patterns 
 }
 
 func Test_format_result_success(t*testing.T) {
-	ready := make(chan bool)
-	go acceptN(t, testHost, testPort, 1, ready)
-	<-ready
+	acceptN(t, testHost, testPort, 1)
 	pingAndAssertFormatResultContains(t, testHost, testPort, "success")
 }
 
