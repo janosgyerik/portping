@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"github.com/janosgyerik/portping"
+	"net"
 )
 
 // TODO
@@ -56,7 +57,7 @@ func main() {
 	port := params.port
 	count := params.count
 
-	addr := fmt.Sprintf("%s:%d", host, port)
+	addr := net.JoinHostPort(host, port)
 	fmt.Printf("Starting to ping %s ...\n", addr)
 
 	c := make(chan error)
