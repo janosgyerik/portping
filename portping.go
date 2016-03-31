@@ -2,7 +2,7 @@
 Package portping provides simple functions to ping TCP ports.
 It also includes a simple command line interface.
  */
-package main
+package portping
 
 import (
 	"net"

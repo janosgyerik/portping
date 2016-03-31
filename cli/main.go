@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"github.com/janosgyerik/portping"
 )
 
 // TODO
@@ -59,7 +60,7 @@ func main() {
 	fmt.Printf("Starting to ping %s ...\n", addr)
 
 	c := make(chan error)
-	go PingN(host, port, count, c)
+	go portping.PingN(host, port, count, c)
 
 	allSuccessful := true
 
@@ -69,7 +70,7 @@ func main() {
 		if err != nil {
 			allSuccessful = false
 		}
-		fmt.Printf("%s [%d] -> %s\n", addr, i + 1, FormatResult(err))
+		fmt.Printf("%s [%d] -> %s\n", addr, i + 1, portping.FormatResult(err))
 	}
 
 	// TODO print summary
