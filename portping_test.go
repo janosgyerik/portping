@@ -10,7 +10,7 @@ import (
 const testHost = "localhost"
 
 // TODO hopefully unused. Better ideas?
-const testPort = "1234"
+const testPort = "4269"
 
 const knownNonexistentHost = "nonexistent.janosgyerik.com"
 
