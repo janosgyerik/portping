@@ -9,11 +9,13 @@ import (
 	"time"
 )
 
+const defaultTimeout = 10 * time.Second
+
 // Ping connects to the specified host and port
 // using net.DialTimeout and network "tcp".
 func Ping(host, port string) error {
 	addr := net.JoinHostPort(host, port)
-	conn, err := net.DialTimeout("tcp", addr, 10*time.Second)
+	conn, err := net.DialTimeout("tcp", addr, defaultTimeout)
 	if conn != nil {
 		defer conn.Close()
 	}
