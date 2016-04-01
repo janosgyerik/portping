@@ -19,6 +19,7 @@ import (
 const (
 	defaultCount = 5
 	defaultTimeout = 10 * time.Second
+	defaultNetwork = "tcp"
 )
 
 func exit() {
@@ -66,7 +67,7 @@ func main() {
 	fmt.Printf("Starting to ping %s ...\n", addr)
 
 	c := make(chan error)
-	go portping.PingN(host, port, defaultTimeout, count, c)
+	go portping.PingN(defaultNetwork, addr, defaultTimeout, count, c)
 
 	allSuccessful := true
 

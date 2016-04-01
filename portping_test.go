@@ -13,12 +13,13 @@ const (
 	testPort = "4269"
 	knownNonexistentHost = "nonexistent.janosgyerik.com"
 	defaultTimeout = 5 * time.Second
+	testNetwork = "tcp"
 )
 
 func acceptN(t*testing.T, host, port string, count int) {
 	ready := make(chan bool)
 	go func() {
-		ln, err := net.Listen("tcp", net.JoinHostPort(host, port))
+		ln, err := net.Listen(testNetwork, net.JoinHostPort(host, port))
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -38,9 +39,8 @@ func acceptN(t*testing.T, host, port string, count int) {
 }
 
 func assertPingResult(t*testing.T, host, port string, expected bool, patterns ...string) {
-	err := Ping(host, port, defaultTimeout)
-
 	addr := net.JoinHostPort(host, port)
+	err := Ping(testNetwork, addr, defaultTimeout)
 	t.Logf("port ping %s -> %v", addr, err)
 
 	actual := err == nil
@@ -70,9 +70,9 @@ func assertPingFailure(t*testing.T, host, port string, patterns ...string) {
 
 func assertPingNSuccessCount(t*testing.T, host, port string, pingCount int, expectedSuccessCount int) {
 	c := make(chan error)
-	go PingN(host, port, defaultTimeout, pingCount, c)
-
 	addr := net.JoinHostPort(host, port)
+	go PingN(testNetwork, addr, defaultTimeout, pingCount, c)
+
 
 	failureCount := 0
 	for i := 0; i < pingCount; i++ {
@@ -151,7 +151,8 @@ func assertFormatResultContains(t*testing.T, err error, patterns ...string) {
 }
 
 func pingAndAssertFormatResultContains(t*testing.T, host, port string, patterns ...string) {
-	assertFormatResultContains(t, Ping(host, port, defaultTimeout), patterns...)
+	addr := net.JoinHostPort(host, port)
+	assertFormatResultContains(t, Ping(testNetwork, addr, defaultTimeout), patterns...)
 }
 
 func Test_format_result_success(t*testing.T) {

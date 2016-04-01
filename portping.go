@@ -9,11 +9,11 @@ import (
 	"time"
 )
 
-// Ping connects to the specified host and port
-// using net.DialTimeout and network "tcp".
-func Ping(host, port string, timeout time.Duration) error {
-	addr := net.JoinHostPort(host, port)
-	conn, err := net.DialTimeout("tcp", addr, timeout)
+// Ping connects to the address on the named network,
+// using net.DialTimeout. If a successful connection is made,
+// return nil. Otherwise return the error.
+func Ping(network, address string, timeout time.Duration) error {
+	conn, err := net.DialTimeout(network, address, timeout)
 	if conn != nil {
 		defer conn.Close()
 	}
@@ -25,9 +25,9 @@ func Ping(host, port string, timeout time.Duration) error {
 
 // PingN calls Ping the specified number of times,
 // and sends the results to the given channel.
-func PingN(host, port string, timeout time.Duration, count int, c chan error) {
+func PingN(network, address string, timeout time.Duration, count int, c chan error) {
 	for i := 0; i < count; i++ {
-		c <- Ping(host, port, timeout)
+		c <- Ping(network, address, timeout)
 	}
 }
 
