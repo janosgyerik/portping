@@ -13,11 +13,7 @@ import (
 // using net.DialTimeout and network "tcp".
 func Ping(host, port string) error {
 	addr := net.JoinHostPort(host, port)
-	a, err := net.ResolveTCPAddr("tcp", addr)
-	if err != nil {
-		return err
-	}
-	conn, err := net.DialTimeout(a.Network(), a.String(), 10*time.Second)
+	conn, err := net.DialTimeout("tcp", addr, 10*time.Second)
 	if conn != nil {
 		defer conn.Close()
 	}
