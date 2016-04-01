@@ -25,3 +25,14 @@ Download
 Binaries for several platforms are available on SourceForge:
 
 https://sourceforge.net/projects/portping/files/
+
+Generate test coverage report
+-----------------------------
+
+Run the commands:
+
+    go test -coverprofile cover.out
+    go tool cover -html=cover.out -o cover.html
+    open cover.html
+
+See more info: https://blog.golang.org/cover
