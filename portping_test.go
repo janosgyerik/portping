@@ -73,7 +73,6 @@ func assertPingNSuccessCount(t*testing.T, host, port string, pingCount int, expe
 	addr := net.JoinHostPort(host, port)
 	go PingN(testNetwork, addr, defaultTimeout, pingCount, c)
 
-
 	failureCount := 0
 	for i := 0; i < pingCount; i++ {
 		err := <-c

@@ -25,7 +25,7 @@ func Ping(network, address string, timeout time.Duration) error {
 
 // PingN calls Ping the specified number of times,
 // and sends the results to the given channel.
-func PingN(network, address string, timeout time.Duration, count int, c chan error) {
+func PingN(network, address string, timeout time.Duration, count int, c chan <- error) {
 	for i := 0; i < count; i++ {
 		c <- Ping(network, address, timeout)
 	}
