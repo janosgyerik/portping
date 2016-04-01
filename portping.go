@@ -9,13 +9,11 @@ import (
 	"time"
 )
 
-const defaultTimeout = 10 * time.Second
-
 // Ping connects to the specified host and port
 // using net.DialTimeout and network "tcp".
-func Ping(host, port string) error {
+func Ping(host, port string, timeout time.Duration) error {
 	addr := net.JoinHostPort(host, port)
-	conn, err := net.DialTimeout("tcp", addr, defaultTimeout)
+	conn, err := net.DialTimeout("tcp", addr, timeout)
 	if conn != nil {
 		defer conn.Close()
 	}
@@ -27,9 +25,9 @@ func Ping(host, port string) error {
 
 // PingN calls Ping the specified number of times,
 // and sends the results to the given channel.
-func PingN(host, port string, count int, c chan error) {
+func PingN(host, port string, timeout time.Duration, count int, c chan error) {
 	for i := 0; i < count; i++ {
-		c <- Ping(host, port)
+		c <- Ping(host, port, timeout)
 	}
 }
 

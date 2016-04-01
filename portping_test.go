@@ -5,14 +5,15 @@ import (
 	"fmt"
 	"net"
 	"strings"
+	"time"
 )
 
-const testHost = "localhost"
-
-// TODO hopefully unused. Better ideas?
-const testPort = "4269"
-
-const knownNonexistentHost = "nonexistent.janosgyerik.com"
+const (
+	testHost = "localhost"
+	testPort = "4269"
+	knownNonexistentHost = "nonexistent.janosgyerik.com"
+	defaultTimeout = 5 * time.Second
+)
 
 func acceptN(t*testing.T, host, port string, count int) {
 	ready := make(chan bool)
@@ -37,7 +38,7 @@ func acceptN(t*testing.T, host, port string, count int) {
 }
 
 func assertPingResult(t*testing.T, host, port string, expected bool, patterns ...string) {
-	err := Ping(host, port)
+	err := Ping(host, port, defaultTimeout)
 
 	addr := net.JoinHostPort(host, port)
 	t.Logf("port ping %s -> %v", addr, err)
@@ -69,7 +70,7 @@ func assertPingFailure(t*testing.T, host, port string, patterns ...string) {
 
 func assertPingNSuccessCount(t*testing.T, host, port string, pingCount int, expectedSuccessCount int) {
 	c := make(chan error)
-	go PingN(host, port, pingCount, c)
+	go PingN(host, port, defaultTimeout, pingCount, c)
 
 	addr := net.JoinHostPort(host, port)
 
@@ -150,7 +151,7 @@ func assertFormatResultContains(t*testing.T, err error, patterns ...string) {
 }
 
 func pingAndAssertFormatResultContains(t*testing.T, host, port string, patterns ...string) {
-	assertFormatResultContains(t, Ping(host, port), patterns...)
+	assertFormatResultContains(t, Ping(host, port, defaultTimeout), patterns...)
 }
 
 func Test_format_result_success(t*testing.T) {

@@ -7,6 +7,7 @@ import (
 	"os"
 	"github.com/janosgyerik/portping"
 	"net"
+	"time"
 )
 
 // TODO
@@ -15,7 +16,10 @@ import (
 // flag: -v verbose; default=false
 // drop default count, print forever, until cancel with Control-C, and print stats
 
-const defaultCount = 5
+const (
+	defaultCount = 5
+	defaultTimeout = 10 * time.Second
+)
 
 func exit() {
 	flag.Usage()
@@ -62,7 +66,7 @@ func main() {
 	fmt.Printf("Starting to ping %s ...\n", addr)
 
 	c := make(chan error)
-	go portping.PingN(host, port, count, c)
+	go portping.PingN(host, port, defaultTimeout, count, c)
 
 	allSuccessful := true
 
