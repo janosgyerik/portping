@@ -60,7 +60,7 @@ func assertPingResult(t*testing.T, host, port string, expected bool, patterns ..
 }
 
 func assertPingSuccess(t*testing.T, host, port string) {
-	assertPingResult(t, host, port, true, "")
+	assertPingResult(t, host, port, true)
 }
 
 func assertPingFailure(t*testing.T, host, port string, patterns ...string) {
