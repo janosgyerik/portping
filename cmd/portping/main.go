@@ -56,6 +56,20 @@ func parseArgs() Params {
 	}
 }
 
+
+// FormatResult converts the result returned by Ping to string.
+func formatResult(err error) string {
+	if err == nil {
+		return "success"
+	}
+	switch err := err.(type) {
+	case *net.OpError:
+		return err.Err.Error()
+	default:
+		return err.Error()
+	}
+}
+
 func main() {
 	params := parseArgs()
 
@@ -77,7 +91,7 @@ func main() {
 		if err != nil {
 			allSuccessful = false
 		}
-		fmt.Printf("%s [%d] -> %s\n", addr, i + 1, portping.FormatResult(err))
+		fmt.Printf("%s [%d] -> %s\n", addr, i + 1, formatResult(err))
 	}
 
 	// TODO print summary

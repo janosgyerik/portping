@@ -30,16 +30,3 @@ func PingN(network, address string, timeout time.Duration, count int, c chan <- 
 		c <- Ping(network, address, timeout)
 	}
 }
-
-// FormatResult converts the result returned by Ping to string.
-func FormatResult(err error) string {
-	if err == nil {
-		return "success"
-	}
-	switch err := err.(type) {
-	case *net.OpError:
-		return err.Err.Error()
-	default:
-		return err.Error()
-	}
-}

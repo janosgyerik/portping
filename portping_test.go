@@ -2,7 +2,6 @@ package portping
 
 import (
 	"testing"
-	"fmt"
 	"net"
 	"strings"
 	"time"
@@ -56,7 +55,7 @@ func assertPingResult(t*testing.T, host, port string, expected bool, patterns ..
 	}
 
 	if err != nil {
-		assertFormatResultContains(t, err, patterns...)
+		assertErrorContains(t, err, patterns...)
 	}
 }
 
@@ -135,8 +134,8 @@ func Test_ping5_partial_success(t*testing.T) {
 	assertPingNSuccessCount(t, testHost, testPort, pingCount, successCount)
 }
 
-func assertFormatResultContains(t*testing.T, err error, patterns ...string) {
-	result := FormatResult(err)
+func assertErrorContains(t*testing.T, err error, patterns ...string) {
+	result := err.Error()
 	foundMatch := false
 	for _, pattern := range patterns {
 		if strings.Contains(result, pattern) {
@@ -147,31 +146,4 @@ func assertFormatResultContains(t*testing.T, err error, patterns ...string) {
 	if !foundMatch {
 		t.Errorf("got '%s'; expected to contain one of '%s'", result, patterns)
 	}
-}
-
-func pingAndAssertFormatResultContains(t*testing.T, host, port string, patterns ...string) {
-	addr := net.JoinHostPort(host, port)
-	assertFormatResultContains(t, Ping(testNetwork, addr, defaultTimeout), patterns...)
-}
-
-func Test_format_result_success(t*testing.T) {
-	acceptN(t, testHost, testPort, 1)
-	pingAndAssertFormatResultContains(t, testHost, testPort, "success")
-}
-
-func Test_format_result_connection_refused(t*testing.T) {
-	pingAndAssertFormatResultContains(t, testHost, testPort, "connection refused")
-}
-
-func Test_format_result_invalid_port_m1(t*testing.T) {
-	pingAndAssertFormatResultContains(t, testHost, "-1", "invalid port", "unknown port")
-}
-
-func Test_format_result_invalid_port_123456(t*testing.T) {
-	pingAndAssertFormatResultContains(t, testHost, "123456", "invalid port", "unknown port")
-}
-
-func Test_format_result_nonexistent_host(t*testing.T) {
-	host := knownNonexistentHost
-	pingAndAssertFormatResultContains(t, host, testPort, fmt.Sprintf("lookup %s: no such host", host))
 }
