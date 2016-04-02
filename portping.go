@@ -17,10 +17,7 @@ func Ping(network, address string, timeout time.Duration) error {
 	if conn != nil {
 		defer conn.Close()
 	}
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }
 
 // PingN calls Ping the specified number of times,
