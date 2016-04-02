@@ -37,25 +37,21 @@ func acceptN(t*testing.T, host, port string, count int) {
 	<-ready
 }
 
-func assertPingResult(t*testing.T, host, port string, expected bool, patterns ...string) {
+func assertPingResult(t*testing.T, host, port string, expectSuccess bool, patterns ...string) {
 	addr := net.JoinHostPort(host, port)
 	err := Ping(testNetwork, addr, defaultTimeout)
 	t.Logf("port ping %s -> %v", addr, err)
 
-	actual := err == nil
-
-	if actual != expected {
-		var openOrClosed string
-		if expected {
-			openOrClosed = "open"
-		} else {
-			openOrClosed = "closed"
-		}
-		t.Errorf("%s should be %s", addr, openOrClosed)
-	}
-
 	if err != nil {
-		assertErrorContains(t, err, patterns...)
+		if expectSuccess {
+			t.Errorf("ping to %s failed; expected success", addr)
+		} else {
+			assertErrorContains(t, err, patterns...)
+		}
+	} else {
+		if !expectSuccess {
+			t.Errorf("ping to %s success; expected failure", addr)
+		}
 	}
 }
 
