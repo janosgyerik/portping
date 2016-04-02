@@ -59,10 +59,6 @@ func assertPingResult(t*testing.T, host, port string, expected bool, patterns ..
 	}
 }
 
-func assertPingSuccess(t*testing.T, host, port string) {
-	assertPingResult(t, host, port, true)
-}
-
 func assertPingFailure(t*testing.T, host, port string, patterns ...string) {
 	assertPingResult(t, host, port, false, patterns...)
 }
@@ -91,7 +87,7 @@ func assertPingNSuccessCount(t*testing.T, host, port string, pingCount int, expe
 func Test_ping_open_port(t*testing.T) {
 	acceptN(t, testHost, testPort, 1)
 
-	assertPingSuccess(t, testHost, testPort)
+	assertPingResult(t, testHost, testPort, true)
 
 	// for sanity: acceptN should have shut down already
 	assertPingFailure(t, testHost, testPort, "connection refused")
