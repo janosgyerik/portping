@@ -59,6 +59,20 @@ func assertPingResult(t*testing.T, host, port string, expected bool, patterns ..
 	}
 }
 
+func assertErrorContains(t*testing.T, err error, patterns ...string) {
+	result := err.Error()
+	foundMatch := false
+	for _, pattern := range patterns {
+		if strings.Contains(result, pattern) {
+			foundMatch = true
+			break
+		}
+	}
+	if !foundMatch {
+		t.Errorf("got '%s'; expected to contain one of '%s'", result, patterns)
+	}
+}
+
 func assertPingFailure(t*testing.T, host, port string, patterns ...string) {
 	assertPingResult(t, host, port, false, patterns...)
 }
@@ -128,18 +142,4 @@ func Test_ping5_partial_success(t*testing.T) {
 
 	pingCount := 5
 	assertPingNSuccessCount(t, testHost, testPort, pingCount, successCount)
-}
-
-func assertErrorContains(t*testing.T, err error, patterns ...string) {
-	result := err.Error()
-	foundMatch := false
-	for _, pattern := range patterns {
-		if strings.Contains(result, pattern) {
-			foundMatch = true
-			break
-		}
-	}
-	if !foundMatch {
-		t.Errorf("got '%s'; expected to contain one of '%s'", result, patterns)
-	}
 }
