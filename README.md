@@ -19,6 +19,10 @@ Output:
     google.com:80 [2] -> success
     google.com:80 [3] -> success
 
+Works with named ports too, for example:
+
+    portping google.com http
+
 See `portping -h` for all available options.
 
 Download
