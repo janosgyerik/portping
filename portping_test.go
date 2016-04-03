@@ -121,7 +121,8 @@ func Test_ping_open_port(t*testing.T) {
 	assertPingResult(t, testHost, testPort, true)
 
 	// for sanity: acceptN should have shut down already
-	assertPingFailure(t, testHost, testPort, "connection refused")
+	// note: "connection reset" is seen in Linux, I suspect acceptN hasn't shut down yet
+	assertPingFailure(t, testHost, testPort, "connection refused", "connection reset")
 }
 
 func Test_ping_unopen_port(t*testing.T) {
