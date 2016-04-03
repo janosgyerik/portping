@@ -10,8 +10,10 @@ import (
 )
 
 // Ping connects to the address on the named network,
-// using net.DialTimeout. If a successful connection is made,
-// return nil. Otherwise return the error.
+// using net.DialTimeout, and immediately closes it.
+// It returns the connection error. A nil value means success.
+// For examples of valid values of network and address,
+// see the documentation of net.Dial
 func Ping(network, address string, timeout time.Duration) error {
 	conn, err := net.DialTimeout(network, address, timeout)
 	if conn != nil {
