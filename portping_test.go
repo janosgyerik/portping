@@ -5,15 +5,36 @@ import (
 	"net"
 	"strings"
 	"time"
+	"strconv"
 )
 
 const (
 	testHost = "localhost"
-	testPort = "4269"
 	knownNonexistentHost = "nonexistent.janosgyerik.com"
 	defaultTimeout = 5 * time.Second
 	testNetwork = "tcp"
 )
+
+var testPort = findKnownAvailablePort()
+
+func findKnownAvailablePort() string {
+	tcpa, err := net.ResolveTCPAddr("tcp", ":0")
+	if err != nil {
+		panic(err)
+	}
+	ln, err := net.ListenTCP("tcp", tcpa)
+	if err != nil {
+		panic(err)
+	}
+	defer ln.Close()
+
+	local, ok := ln.Addr().(*net.TCPAddr)
+	if !ok {
+		panic("Unable to convert Addr to TCPAddr")
+	}
+
+	return strconv.Itoa(local.Port)
+}
 
 func acceptN(t*testing.T, host, port string, count int) {
 	ready := make(chan bool)
