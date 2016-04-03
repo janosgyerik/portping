@@ -36,14 +36,20 @@ func findKnownAvailablePort() string {
 	return strconv.Itoa(local.Port)
 }
 
-func acceptN(t*testing.T, host, port string, count int, ready chan <- bool) {
+func acceptN(t*testing.T, host, port string, count int, ready chan <- bool, done chan <- bool) {
 	ln, err := net.Listen(testNetwork, net.JoinHostPort(host, port))
 	if err != nil {
+		ready <- true
+		done <- true
 		t.Fatal(err)
 	}
-	defer ln.Close()
 
 	ready <- true
+
+	defer func() {
+		ln.Close()
+		done <- true
+	}()
 
 	for i := 0; i < count; i++ {
 		conn, err := ln.Accept()
@@ -113,10 +119,12 @@ func assertPingNSuccessCount(t*testing.T, host, port string, pingCount int, expe
 
 func Test_ping_open_port(t*testing.T) {
 	ready := make(chan bool)
-	go acceptN(t, testHost, testPort, 1, ready)
+	done := make(chan bool)
+	go acceptN(t, testHost, testPort, 1, ready, done)
 	<-ready
 
 	assertPingResult(t, testHost, testPort, true)
+	<-done
 
 	// for sanity: acceptN should have shut down already
 	assertPingFailure(t, testHost, testPort, "connection refused")
@@ -141,10 +149,12 @@ func Test_ping_too_high_port(t*testing.T) {
 func Test_ping5_all_success(t*testing.T) {
 	pingCount := 3
 	ready := make(chan bool)
-	go acceptN(t, testHost, testPort, pingCount, ready)
+	done := make(chan bool)
+	go acceptN(t, testHost, testPort, pingCount, ready, done)
 	<-ready
 
 	assertPingNSuccessCount(t, testHost, testPort, pingCount, pingCount)
+	<-done
 }
 
 func Test_ping5_all_fail(t*testing.T) {
@@ -156,9 +166,11 @@ func Test_ping5_all_fail(t*testing.T) {
 func Test_ping5_partial_success(t*testing.T) {
 	successCount := 3
 	ready := make(chan bool)
-	go acceptN(t, testHost, testPort, successCount, ready)
+	done := make(chan bool)
+	go acceptN(t, testHost, testPort, successCount, ready, done)
 	<-ready
 
 	pingCount := 5
 	assertPingNSuccessCount(t, testHost, testPort, pingCount, successCount)
+	<-done
 }
