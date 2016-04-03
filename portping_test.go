@@ -141,15 +141,15 @@ func Test_ping_too_high_port(t*testing.T) {
 	assertPingFailure(t, testHost, "123456", "invalid port", "unknown port")
 }
 
-func Test_ping5_all_success(t*testing.T) {
+func Test_ping3_all_success(t*testing.T) {
 	pingCount := 3
 	acceptN(t, testHost, testPort, pingCount)
 
 	assertPingNSuccessCount(t, testHost, testPort, pingCount, pingCount)
 }
 
-func Test_ping5_all_fail(t*testing.T) {
-	pingCount := 5
+func Test_ping3_all_fail(t*testing.T) {
+	pingCount := 3
 	successCount := 0
 	assertPingNSuccessCount(t, testHost, testPort, pingCount, successCount)
 }
