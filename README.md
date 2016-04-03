@@ -3,6 +3,8 @@ portping
 
 A command line utility to ping ports
 
+[![GoDoc](https://godoc.org/github.com/janosgyerik/portping?status.svg)](https://godoc.org/github.com/janosgyerik/portping)
+
 Usage
 -----
 
