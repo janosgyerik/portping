@@ -110,8 +110,8 @@ func assertPingNSuccessCount(t*testing.T, host, port string, pingCount int, expe
 	}
 
 	successCount := pingCount - failureCount
-	if expectedSuccessCount != successCount {
-		t.Errorf("expected %d successful pings, but got only %d", expectedSuccessCount, successCount)
+	if successCount != expectedSuccessCount {
+		t.Errorf("expected %d successful pings, but got %d", expectedSuccessCount, successCount)
 	}
 }
 
