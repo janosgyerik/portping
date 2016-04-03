@@ -8,9 +8,9 @@ A command line utility to ping ports
 Usage
 -----
 
-Ping port 80 of google.com 5 times:
+Ping port 80 of google.com 3 times:
 
-    portping -c 5 google.com 80
+    portping -c 3 google.com 80
     
 Output:
 
