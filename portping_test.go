@@ -36,26 +36,22 @@ func findKnownAvailablePort() string {
 	return strconv.Itoa(local.Port)
 }
 
-func acceptN(t*testing.T, host, port string, count int) {
-	ready := make(chan bool)
-	go func() {
-		ln, err := net.Listen(testNetwork, net.JoinHostPort(host, port))
+func acceptN(t*testing.T, host, port string, count int, ready chan <- bool) {
+	ln, err := net.Listen(testNetwork, net.JoinHostPort(host, port))
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer ln.Close()
+
+	ready <- true
+
+	for i := 0; i < count; i++ {
+		conn, err := ln.Accept()
 		if err != nil {
 			t.Fatal(err)
 		}
-		defer ln.Close()
-
-		ready <- true
-
-		for i := 0; i < count; i++ {
-			conn, err := ln.Accept()
-			if err != nil {
-				t.Fatal(err)
-			}
-			conn.Close()
-		}
-	}()
-	<-ready
+		conn.Close()
+	}
 }
 
 func assertPingResult(t*testing.T, host, port string, expectSuccess bool, patterns ...string) {
@@ -116,7 +112,9 @@ func assertPingNSuccessCount(t*testing.T, host, port string, pingCount int, expe
 }
 
 func Test_ping_open_port(t*testing.T) {
-	acceptN(t, testHost, testPort, 1)
+	ready := make(chan bool)
+	go acceptN(t, testHost, testPort, 1, ready)
+	<-ready
 
 	assertPingResult(t, testHost, testPort, true)
 
@@ -142,7 +140,9 @@ func Test_ping_too_high_port(t*testing.T) {
 
 func Test_ping5_all_success(t*testing.T) {
 	pingCount := 3
-	acceptN(t, testHost, testPort, pingCount)
+	ready := make(chan bool)
+	go acceptN(t, testHost, testPort, pingCount, ready)
+	<-ready
 
 	assertPingNSuccessCount(t, testHost, testPort, pingCount, pingCount)
 }
@@ -155,7 +155,9 @@ func Test_ping5_all_fail(t*testing.T) {
 
 func Test_ping5_partial_success(t*testing.T) {
 	successCount := 3
-	acceptN(t, testHost, testPort, successCount)
+	ready := make(chan bool)
+	go acceptN(t, testHost, testPort, successCount, ready)
+	<-ready
 
 	pingCount := 5
 	assertPingNSuccessCount(t, testHost, testPort, pingCount, successCount)
