@@ -75,19 +75,15 @@ func formatResult(err error) string {
 func main() {
 	params := parseArgs()
 
-	host := params.host
-	port := params.port
-	count := params.count
-
-	addr := net.JoinHostPort(host, port)
+	addr := net.JoinHostPort(params.host, params.port)
 	fmt.Printf("Starting to ping %s ...\n", addr)
 
 	c := make(chan error)
-	go portping.PingN(defaultNetwork, addr, params.timeout, count, c)
+	go portping.PingN(defaultNetwork, addr, params.timeout, params.count, c)
 
 	allSuccessful := true
 
-	for i := 0; i < count; i++ {
+	for i := 0; i < params.count; i++ {
 		// TODO add time
 		err := <-c
 		if err != nil {
