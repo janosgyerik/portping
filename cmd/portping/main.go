@@ -17,7 +17,7 @@ import (
 
 const (
 	defaultCount = 5
-	defaultTimeout = 10
+	defaultTimeoutSeconds = 10
 	defaultNetwork = "tcp"
 )
 
@@ -40,7 +40,7 @@ func parseArgs() Params {
 	}
 
 	countPtr := flag.Int("c", defaultCount, "stop after count connections")
-	timeoutPtr := flag.Int("W", defaultTimeout, "time in seconds to wait for connections")
+	timeoutPtr := flag.Int("W", defaultTimeoutSeconds, "time in seconds to wait for connections")
 	flag.Parse()
 
 	if len(flag.Args()) < 2 {
