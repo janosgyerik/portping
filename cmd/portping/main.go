@@ -11,8 +11,6 @@ import (
 )
 
 // TODO
-// flags: --tcp, --udp; default is tcp
-// flag: -v verbose; default=false
 // drop default count, print forever, until cancel with Control-C, and print stats
 
 const (
@@ -31,6 +29,7 @@ type Params struct {
 	port    string
 	count   int
 	timeout time.Duration
+	network string
 }
 
 func parseArgs() Params {
@@ -41,6 +40,7 @@ func parseArgs() Params {
 
 	countPtr := flag.Int("c", defaultCount, "stop after count connections")
 	timeoutPtr := flag.Int("W", defaultTimeoutSeconds, "time in seconds to wait for connections")
+	network := flag.String("net", defaultNetwork, "the network to use")
 	flag.Parse()
 
 	if len(flag.Args()) < 2 {
@@ -55,6 +55,7 @@ func parseArgs() Params {
 		port: port,
 		count: *countPtr,
 		timeout: time.Duration(*timeoutPtr) * time.Second,
+		network: *network,
 	}
 }
 
@@ -79,7 +80,7 @@ func main() {
 	fmt.Printf("Starting to ping %s ...\n", addr)
 
 	c := make(chan error)
-	go portping.PingN(defaultNetwork, addr, params.timeout, params.count, c)
+	go portping.PingN(params.network, addr, params.timeout, params.count, c)
 
 	allSuccessful := true
 
